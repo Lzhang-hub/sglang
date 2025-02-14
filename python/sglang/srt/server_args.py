@@ -169,6 +169,7 @@ class ServerArgs:
     enable_hierarchical_cache: bool = False
 
     enable_flashinfer_mla: bool = False
+    enable_triton_block_fp8: bool = False
 
     def __post_init__(self):
         # Set missing default values
@@ -699,6 +700,11 @@ class ServerArgs:
             "--enable-flashinfer-mla",
             action="store_true",
             help="Enable FlashInfer MLA optimization",
+        )
+        parser.add_argument(
+            "--enable-triton-block-fp8",
+            action="store_true",
+            help="Enable triton block fp8 optimization, it has better performance for small batch",
         )
 
         # Speculative decoding

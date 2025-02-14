@@ -7,6 +7,7 @@ from sglang.srt.layers.quantization.fp8_kernel import (
     per_token_group_quant_fp8,
     w8a8_block_fp8_matmul,
 )
+from sglang.srt.managers.schedule_batch import global_server_args_dict
 from sglang.srt.utils import is_hip
 
 is_hip_ = is_hip()
@@ -68,7 +69,11 @@ def apply_w8a8_block_fp8_linear(
     shape_supported_by_cutlass = (
         weight.shape[0] % 128 == 0 and weight.shape[1] % 128 == 0
     )
-    if CUTLASS_BLOCK_FP8_SUPPORTED and shape_supported_by_cutlass:
+    if (
+        CUTLASS_BLOCK_FP8_SUPPORTED
+        and shape_supported_by_cutlass
+        and not global_server_args_dict["enable_triton_block_fp8"]
+    ):
         q_input, x_scale = per_token_group_quant_fp8(
             input_2d, block_size[1], column_major_scales=True
         )
